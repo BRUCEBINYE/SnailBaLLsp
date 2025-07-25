@@ -7,7 +7,7 @@ import torch
 from sklearn.model_selection import train_test_split, KFold
 
 from addMAEtrain import *
-from add_MAE_train_tuning_param import *
+from addMAEparam import *
 import itertools
 
 DEVICE = torch.device("cuda:0")

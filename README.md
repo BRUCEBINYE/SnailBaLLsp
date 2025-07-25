@@ -71,7 +71,7 @@ python run_test_independent.py
 
 If you think SnailBaLLsp is useful, please cite our work when you use it:
 
-Bin Ye, Junfeng Xia, Xia Wan, Min Wu, Satoshi Chiba. [Multi‐barcoding‐based Gastropoda identification using hierarchical attention network with staged curriculum learning](). Submitting.
+B. Y., J. X., X. W., M. W., S. C.. [Multi‐barcoding‐based Gastropoda identification using hierarchical attention network with staged curriculum learning](). Submitting.
 
 ## License
 

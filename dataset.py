@@ -10,7 +10,7 @@ from torch.utils.data import Dataset, DataLoader
 class MultiModalCOIDataset(Dataset):
     def __init__(self, embeddings_dict, labels):
         """
-        embeddings_dict: 包含各模态嵌入的字典，格式如：
+        embeddings_dict:
         {
             'coi': tensor(coi_emb), 
             'rn16s': tensor(rn16s_emb),

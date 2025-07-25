@@ -14,7 +14,7 @@ from sklearn.metrics import accuracy_score, f1_score
 from model import *
 from dataset import *
 
-DEVICE = torch.device("cuda:3")
+DEVICE = torch.device("cuda:0")
 
 
 

@@ -1,6 +1,6 @@
 # SnailBaLLsp
 
-This repository contains codes of SnailBaLLsp, a hierarchical attention network with staged curriculum learning for multi‐barcoding‐based Gastropoda identification. More details about SnailBaLLsp could be found in our [paper]().
+This repository contains codes of **SnailBaLLsp**, a hierarchical attention network with staged curriculum learning for multi‐barcoding‐based Gastropoda identification. This model is an improvement of [SnailBaLL](), and is an end-to-end species identification model for hierarchical taxonomy levels of Gastropoda from subclass to species. More details about SnailBaLLsp could be found in our [paper]().
 
 ## Device
 we recommend running SnailBaLLsp with a GPU like NVIDIA GeForce RTX 3090, etc. 
@@ -13,7 +13,7 @@ cd ./SnailBallsp
 
 ## Environment
 
-Firstly, create a new environment snailballsp by:
+Firstly, create a new environment `snailballsp` by:
 
 ```
 conda create --name snailballsp python=3.9
@@ -71,7 +71,7 @@ python run_test_independent.py
 
 If you think SnailBaLLsp is useful, please cite our work when you use it:
 
-Bin Ye, Junfeng Xia, Xia Wan, Min Wu, Satoshi Chiba. [Multi‐barcoding‐based Gastropoda identification using hierarchical attention network with staged curriculum learning]. Submitting.
+Bin Ye, Junfeng Xia, Xia Wan, Min Wu, Satoshi Chiba. [Multi‐barcoding‐based Gastropoda identification using hierarchical attention network with staged curriculum learning](). Submitting.
 
 ## License
 

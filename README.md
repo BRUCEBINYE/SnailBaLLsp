@@ -1,6 +1,6 @@
 # SnailBaLLsp
 
-This repository contains codes of SnailBaLLsp, **a hierarchical attention network with staged curriculum learning for multi‐barcoding‐based Gastropoda identification**. This model is an improvement of [SnailBaLL](https://github.com/BRUCEBINYE/SnailBaLL), and is an end-to-end species identification model for hierarchical taxonomy levels of Gastropoda from subclass to species. More details about SnailBaLLsp could be found in our [paper]().
+This repository contains codes of SnailBaLLsp, **a hierarchical attention network with staged curriculum learning for multi‐barcoding‐based species identification**. This model is an improvement method comparing to the previoud [SnailBaLL](https://github.com/BRUCEBINYE/SnailBaLL), and is an end-to-end species identification model for hierarchical taxonomy levels of Gastropoda from subclass to species. More details about SnailBaLLsp could be found in our [paper]().
 
 ## Device
 we recommend running SnailBaLLsp with a GPU like NVIDIA GeForce RTX 3090, etc. 
@@ -31,9 +31,9 @@ pip install mamba-ssm==2.0.3
 ```
 
 
-## Embedding extraxtion
+## Embedding extraction
 
-SnailBallsp uses RNA secondary structure embeddings of COI, 16S, H3, 18S, ITS1, and ITS2, which are extracted by the RNA foundation model ERNIE-RNA ([https://github.com/Bruce-ywj/ERNIE-RNA](https://github.com/Bruce-ywj/ERNIE-RNA)); and also used DNA barcoding embedding of COI extracted by the DNA barcoding foundation model BarcodeMAE ([https://github.com/bioscan-ml/BarcodeMAE](https://github.com/bioscan-ml/BarcodeMAE)). 
+SnailBallsp uses RNA secondary structure embeddings of COI, 16S, H3, 18S, ITS1, and ITS2, which are extracted from the RNA foundation model ERNIE-RNA ([https://github.com/Bruce-ywj/ERNIE-RNA](https://github.com/Bruce-ywj/ERNIE-RNA)); and also used DNA barcoding embedding of COI extracted from the DNA barcoding foundation model BarcodeMAE ([https://github.com/bioscan-ml/BarcodeMAE](https://github.com/bioscan-ml/BarcodeMAE)). 
 
 Please extract the embeddings of related barcoding types according to the guideline of the two methods. Here, we assume that you have successfully obtained embeddings from DNA barcoding sequences according the manuals of ERNIE-RNA ([https://github.com/Bruce-ywj/ERNIE-RNA](https://github.com/Bruce-ywj/ERNIE-RNA)) and BarcodeMAE ([https://github.com/bioscan-ml/BarcodeMAE](https://github.com/bioscan-ml/BarcodeMAE)). 
 
@@ -71,7 +71,7 @@ python run_test_independent.py
 
 If you think SnailBaLLsp is useful, please cite our work when you use it:
 
-B. Y., J. X., X. W., M. W., S. C.. [Multi‐barcoding‐based Gastropoda identification using hierarchical attention network with staged curriculum learning](). Submitting.
+B. Y., J. X., X. W., M. W., S. C.. [Multi‐barcoding‐based species identification using hierarchical attention network with staged curriculum learning](). Submitting.
 
 ## License
 

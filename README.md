@@ -6,7 +6,7 @@ This repository contains codes of SnailBaLLsp, **a hierarchical attention networ
 we recommend running SnailBaLLsp with a GPU like NVIDIA GeForce RTX 3090, etc. 
 
 ## Download
-```python
+```
 git clone https://github.com/BRUCEBINYE/SnailBaLLsp.git
 cd ./SnailBallsp
 ```

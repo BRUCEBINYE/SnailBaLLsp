@@ -1,6 +1,6 @@
 # SnailBaLLsp
 
-This repository contains codes of SnailBaLLsp, **a hierarchical attention network with staged curriculum learning for multi‐barcoding‐based species identification**. This model is an improvement method comparing to the previoud [SnailBaLL](https://github.com/BRUCEBINYE/SnailBaLL), and is an end-to-end species identification model for hierarchical taxonomy levels of Gastropoda from subclass to species. More details about SnailBaLLsp could be found in our [paper]().
+This repository contains codes of SnailBaLLsp, **a hierarchical attention network with staged curriculum learning for multi‐barcoding‐based species identification**. This model is an improvement method comparing to the previous [SnailBaLL](https://github.com/BRUCEBINYE/SnailBaLL), and is an end-to-end species identification model for hierarchical taxonomy levels of Gastropoda from subclass to species. More details about SnailBaLLsp could be found in our [paper]().
 
 ## Device
 we recommend running SnailBaLLsp with a GPU like NVIDIA GeForce RTX 3090, etc. 
@@ -67,7 +67,7 @@ To predict results of independent testing dataset, particular for the unseen dat
 python run_test_independent.py
 ```
 
-## Citations
+## Citation
 
 If you think SnailBaLLsp is useful, please cite our work when you use it:
 

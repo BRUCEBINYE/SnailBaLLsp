@@ -105,25 +105,25 @@ def align_multimodal_data(coi_emb, coi_index,
 
 
 
-coi_emb = np.load("/data4/yebin/ERNIE-RNA/results/ernie_rna_representations/EDITED_Augmented_76577_All_used_Gastropoda_seqs_Taxinomy_sequences/cls_embedding.npy")
+coi_emb = np.load("./embedding/ERNIE-RNA/Augmented_76577_All_used_Gastropoda_seqs_Taxinomy_sequences/cls_embedding.npy")
 coi_index = np.array([i for i in range(coi_emb.shape[0])])
 
-rn16s_emb = np.load("/data4/yebin/ERNIE-RNA/results/ernie_rna_representations/Augmented_Other_Marker_16S_sequences/cls_embedding.npy")
-rn16s_index = pd.read_csv("/data4/yebin/COI/SnailBaLLsp_package/data/Augmented_Other_Marker_16S.txt", sep="\t")['Index'].values
+rn16s_emb = np.load("./embedding/ERNIE-RNA/Augmented_Other_Marker_16S_sequences/cls_embedding.npy")
+rn16s_index = pd.read_csv("./data_Train_Val_Test/Augmented_Other_Marker_16S.txt", sep="\t")['Index'].values
 
-h3_emb = np.load("/data4/yebin/ERNIE-RNA/results/ernie_rna_representations/Augmented_Other_Marker_H3_sequences/cls_embedding.npy")
-h3_index = pd.read_csv("/data4/yebin/COI/SnailBaLLsp_package/data/Augmented_Other_Marker_H3.txt", sep="\t")['Index'].values
+h3_emb = np.load("./embedding/ERNIE-RNA/Augmented_Other_Marker_H3_sequences/cls_embedding.npy")
+h3_index = pd.read_csv("./data_Train_Val_Test/Augmented_Other_Marker_H3.txt", sep="\t")['Index'].values
 
-rn18s_emb = np.load("/data4/yebin/ERNIE-RNA/results/ernie_rna_representations/Augmented_Other_Marker_18S_sequences/cls_embedding.npy")
-rn18s_index = pd.read_csv("/data4/yebin/COI/SnailBaLLsp_package/data/Augmented_Other_Marker_18S.txt", sep="\t")['Index'].values
+rn18s_emb = np.load("./embedding/ERNIE-RNA/Augmented_Other_Marker_18S_sequences/cls_embedding.npy")
+rn18s_index = pd.read_csv("./data_Train_Val_Test/Augmented_Other_Marker_18S.txt", sep="\t")['Index'].values
 
-its1_emb = np.load("/data4/yebin/ERNIE-RNA/results/ernie_rna_representations/Augmented_Other_Marker_ITS1_sequences/cls_embedding.npy")
-its1_index = pd.read_csv("/data4/yebin/COI/SnailBaLLsp_package/data/Augmented_Other_Marker_ITS1.txt", sep="\t")['Index'].values
+its1_emb = np.load("./embedding/ERNIE-RNA/Augmented_Other_Marker_ITS1_sequences/cls_embedding.npy")
+its1_index = pd.read_csv("./data_Train_Val_Test/Augmented_Other_Marker_ITS1.txt", sep="\t")['Index'].values
 
-its2_emb = np.load("/data4/yebin/ERNIE-RNA/results/ernie_rna_representations/Augmented_Other_Marker_ITS2_sequences/cls_embedding.npy")
-its2_index = pd.read_csv("/data4/yebin/COI/SnailBaLLsp_package/data/Augmented_Other_Marker_ITS2.txt", sep="\t")['Index'].values
+its2_emb = np.load("./embedding/ERNIE-RNA/Augmented_Other_Marker_ITS2_sequences/cls_embedding.npy")
+its2_index = pd.read_csv("./data_Train_Val_Test/Augmented_Other_Marker_ITS2.txt", sep="\t")['Index'].values
 
-dfl = pd.read_csv("/data4/yebin/COI/SnailBaLLsp_package/data/EDITED_Augmented_76577_All_used_Gastropoda_seqs_Taxinomy_LabelSpecies.txt", sep="\t")
+dfl = pd.read_csv("./data_Train_Val_Test/Augmented_76577_All_used_Gastropoda_seqs_Taxinomy_LabelSpecies.txt", sep="\t")
 labels = dfl[['subclass', 'order', 'superfamily', 'family', 'genus', 'species']]
 labels = preprocess_labels(labels, [2, 24, 103, 354, 2753, 11295])
 

@@ -20,7 +20,7 @@ def preprocess_labels(lbs_df, n_classes_list):
         min_label = lbs_df[level].min()
         n_class = n_classes_list[i]
         assert max_label < n_class and min_label >= 0, \
-            f"Error：{level}label range [{min_label}, {max_label}]is larger than number of labels{n_class}"
+            f"Error：{level}label range [{min_label}, {max_label}]is larger than number of {n_class}"
     
     return [
         lbs_df['subclass'].values,

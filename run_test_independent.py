@@ -96,16 +96,16 @@ tester = FixedMultiModalTester(
 
 #### GenBank From 20250101-20250523
 label_arrays_1 = tester.load_labels(
-    "/data4/yebin/COI/SnailBaLLsp_package/data_Independent/GenBank_From20250101/Independent_Gastropoda_seqs_n_1927_EDITED_LabelSpecies.txt"
+    "./data_Independent/GenBank_From20250101/Independent_Gastropoda_seqs_n_1927_EDITED_LabelSpecies.txt"
 )
-coi_emb_1 = np.load("/data4/yebin/ERNIE-RNA/results/ernie_rna_representations/GenBank_From20250101_Independent_Gastropoda_seqs_n_1927_EDITED_sequences/cls_embedding.npy")
+coi_emb_1 = np.load("./embedding/ERNIE-RNA/Independent1_GenBank_From20250101_n_1927_EDITED_sequences/cls_embedding.npy")
 print(coi_emb_1.shape)
 
 #### BOLD_Mar2025 Gastropoda, real seqs
 label_arrays_2 = tester.load_labels(
-    "/data4/yebin/COI/SnailBaLLsp_package/data_Independent/BOLD_Mar2025_Gastropoda/EDITED_Independent2_BOLD_Taxonomy_label_is_the_SAME_with_training_LabelsSpecies.txt"
+    "./data_Independent/BOLD_Mar2025_Gastropoda/EDITED_Independent2_BOLD_Taxonomy_label_is_the_SAME_with_training_LabelsSpecies.txt"
 )  # need to train new model
-coi_emb_2 = np.load("/data4/yebin/ERNIE-RNA/results/ernie_rna_representations/EDITED_Independent2_BOLD_Taxonomy_label_is_the_SAME_with_training_Sequences/cls_embedding.npy")
+coi_emb_2 = np.load("./embedding/ERNIE-RNA/Independent2_BOLD_Taxonomy_label_is_the_SAME_with_training_Sequences/cls_embedding.npy")
 print(coi_emb_2.shape)
 
 #### Merge two independent test sets

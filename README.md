@@ -39,6 +39,21 @@ Please extract the embeddings of related barcoding types according to the guidel
 
 These embeddings had been deposited in DYRAD [https://doi.org/10.5061/dryad.ttdz08m9c](https://doi.org/10.5061/dryad.ttdz08m9c). You can download embedding files an put them in the folder of `./SnailBaLLsp/` for directly using.
 
+## Label
+
+The labels of species in multiple taxonomy levels for training in our model were also deposited in DYRAD [https://doi.org/10.5061/dryad.ttdz08m9c](https://doi.org/10.5061/dryad.ttdz08m9c). We provided 6 taxonomy levels for every sequence of Gastropoda, subclass, order, superfamily, family, genus, species. The number of categories of each taxonomy level is as follows:
+
+Taxonomy level | Number of categories
+---- | ----
+Subclass | 2
+Order | 24
+Superfamily | 103
+Family | 354
+Genus | 2753
+Species | 11295
+
+When training your own dataset, you need to edit the number of categories of each taxonomy level in the corresponding codes.
+
 ## Training
 
 Training the model with three-stage learning:

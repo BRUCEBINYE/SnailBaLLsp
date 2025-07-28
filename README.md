@@ -41,7 +41,7 @@ These embeddings had been deposited in DYRAD [https://doi.org/10.5061/dryad.ttdz
 
 ## Label
 
-The labels of species in multiple taxonomy levels for training in our model were also deposited in DYRAD [https://doi.org/10.5061/dryad.ttdz08m9c](https://doi.org/10.5061/dryad.ttdz08m9c). We provided 6 taxonomy levels for every sequence of Gastropoda, subclass, order, superfamily, family, genus, species. The number of categories of each taxonomy level is as follows:
+The labels of species in multiple taxonomy levels for training in our model were also deposited in DYRAD [https://doi.org/10.5061/dryad.ttdz08m9c](https://doi.org/10.5061/dryad.ttdz08m9c). We provided 6 taxonomy levels for every sequence of Gastropoda, including subclass, order, superfamily, family, genus, and species. The number of categories of each taxonomy level is as follows:
 
 Taxonomy level | Number of categories
 ---- | ----

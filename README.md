@@ -3,7 +3,7 @@
 This repository contains codes of SnailBaLLsp, **a hierarchical attention network with staged curriculum learning for multi‐barcoding‐based species identification**. This model is an improvement method comparing to the previous [SnailBaLL](https://github.com/BRUCEBINYE/SnailBaLL), and is an end-to-end species identification model for hierarchical taxonomy levels of Gastropoda from subclass to species. More details about SnailBaLLsp could be found in our [paper]().
 
 ## Device
-we recommend running SnailBaLLsp with a GPU like NVIDIA GeForce RTX 3090, etc. 
+We recommend running SnailBaLLsp with a GPU like NVIDIA GeForce RTX 3090, etc. 
 
 ## Download
 ```
@@ -35,13 +35,13 @@ pip install mamba-ssm==2.0.3
 
 SnailBallsp uses RNA secondary structure embeddings of COI, 16S, H3, 18S, ITS1, and ITS2, which are extracted from the RNA foundation model ERNIE-RNA ([https://github.com/Bruce-ywj/ERNIE-RNA](https://github.com/Bruce-ywj/ERNIE-RNA)); and also used DNA barcoding embedding of COI extracted from the DNA barcoding foundation model BarcodeMAE ([https://github.com/bioscan-ml/BarcodeMAE](https://github.com/bioscan-ml/BarcodeMAE)). 
 
-Please extract the embeddings of related barcoding types according to the guideline of the two methods. Here, we assume that you have successfully obtained embeddings from DNA barcoding sequences according the manuals of ERNIE-RNA ([https://github.com/Bruce-ywj/ERNIE-RNA](https://github.com/Bruce-ywj/ERNIE-RNA)) and BarcodeMAE ([https://github.com/bioscan-ml/BarcodeMAE](https://github.com/bioscan-ml/BarcodeMAE)). 
+Please extract the embeddings of related barcoding types according to the guideline of the two methods. Here, we assume that you have successfully obtained embeddings of sequences according the manuals of ERNIE-RNA ([https://github.com/Bruce-ywj/ERNIE-RNA](https://github.com/Bruce-ywj/ERNIE-RNA)) and BarcodeMAE ([https://github.com/bioscan-ml/BarcodeMAE](https://github.com/bioscan-ml/BarcodeMAE)). 
 
-These embeddings had been deposited in DYRAD [https://doi.org/10.5061/dryad.ttdz08m9c](https://doi.org/10.5061/dryad.ttdz08m9c). You can download embedding files an put them in the folder of `./SnailBaLLsp/` for directly using.
+These embeddings had been deposited in DYRAD [https://doi.org/10.5061/dryad.ttdz08m9c](https://doi.org/10.5061/dryad.ttdz08m9c). You can download embedding files and put them in the folder `./SnailBaLLsp/` for directly using.
 
 ## Label
 
-The labels of species in multiple taxonomy levels for training in our model were also deposited in DYRAD [https://doi.org/10.5061/dryad.ttdz08m9c](https://doi.org/10.5061/dryad.ttdz08m9c). We provided 6 taxonomy levels for every sequence of Gastropoda, including subclass, order, superfamily, family, genus, and species. The number of categories of each taxonomy level is as follows:
+Labels in multiple taxonomy levels for training in our model were also deposited in DYRAD [https://doi.org/10.5061/dryad.ttdz08m9c](https://doi.org/10.5061/dryad.ttdz08m9c). We provided 6 taxonomy levels for every sequence of Gastropoda, including subclass, order, superfamily, family, genus, and species. The number of categories of each taxonomy level is as follows:
 
 Taxonomy level | Number of categories
 ---- | ----

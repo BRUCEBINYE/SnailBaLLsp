@@ -54,7 +54,7 @@ Species | 11295
 
 When training your own dataset, you need to edit the number of categories of each taxonomy level in the corresponding codes.
 
-## Training
+## Training, validation, and testing
 
 Training the model with three-stage learning:
 

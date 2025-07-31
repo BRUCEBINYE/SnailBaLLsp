@@ -8,28 +8,18 @@ We recommend running SnailBaLLsp with a GPU like NVIDIA GeForce RTX 3090, etc.
 ## Download
 ```
 git clone https://github.com/BRUCEBINYE/SnailBaLLsp.git
-cd ./SnailBaLLsp
+cd SnailBaLLsp
 ```
 
 ## Environment
 
-Firstly, create a new environment `snailballsp` by:
+Firstly, please create a new environment `snailballsp`:
 
 ```
-conda create --name snailballsp python=3.9.4
+conda env create -n snailballsp -f environment.yml
 conda activate snailballsp
+pip install https://github.com/state-spaces/mamba/releases/download/v2.2.1/mamba_ssm-2.2.1+cu122torch2.3cxx11abiFALSE-cp38-cp38-linux_x86_64.whl
 ```
-
-Then you need to install the following packages in the environment
-
-```
-conda install pandas=2.2.3 numpy=1.26.3 scikit-learn=1.6.1
-
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu117
-
-pip install mamba-ssm
-```
-
 
 ## Embedding extraction
 

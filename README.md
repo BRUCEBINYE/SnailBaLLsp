@@ -25,7 +25,7 @@ Then you need to install the following packages in the environment
 ```
 conda install pandas=2.2.3 numpy=1.26.3 scikit-learn=1.6.1
 
-pip install torch==2.3.1 torchvision==0.18.1
+pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 
 pip install mamba-ssm==2.0.3
 ```

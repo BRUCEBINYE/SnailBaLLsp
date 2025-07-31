@@ -8,7 +8,7 @@ We recommend running SnailBaLLsp with a GPU like NVIDIA GeForce RTX 3090, etc.
 ## Download
 ```
 git clone https://github.com/BRUCEBINYE/SnailBaLLsp.git
-cd ./SnailBallsp
+cd ./SnailBaLLsp
 ```
 
 ## Environment

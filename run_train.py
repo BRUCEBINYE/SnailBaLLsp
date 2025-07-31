@@ -166,8 +166,8 @@ full_dataset = MultiModalCOIDataset(
 trainval_dataset = torch.utils.data.Subset(full_dataset, trainval_idx)
 test_dataset = torch.utils.data.Subset(full_dataset, test_idx)
 
-torch.save(trainval_idx, "data/trainval_idx.npy")
-torch.save(test_idx, "data/test_idx.npy")
+torch.save(trainval_idx, "trainval_idx.npy")
+torch.save(test_idx, "test_idx.npy")
 
 # Organize data format
 full_data = {

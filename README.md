@@ -52,7 +52,7 @@ Training the model with three-stage learning:
 python run_train.py
 ```
 
-After saving the trained models, you can apply domain adaptation approach to the model:
+After saving the trained models, you can apply domain adaptation approach to the model. 
 
 ```
 python run_train_domainAD.py
@@ -63,6 +63,8 @@ When adding the DNA barcoding embedding of COI as an additional feature of COI t
 ```
 python add_MAE_run_train.py
 ```
+
+We also deposited the models pretrained at every stage in DYRAD [https://doi.org/10.5061/dryad.ttdz08m9c](https://doi.org/10.5061/dryad.ttdz08m9c), and these models could be used directly.
 
 ## Independent testing
 

@@ -16,7 +16,7 @@ cd ./SnailBaLLsp
 Firstly, create a new environment `snailballsp` by:
 
 ```
-conda create --name snailballsp python=3.9
+conda create --name snailballsp python=3.9.4
 conda activate snailballsp
 ```
 
@@ -27,7 +27,7 @@ conda install pandas=2.2.3 numpy=1.26.3 scikit-learn=1.6.1
 
 pip install torch==1.13.0 torchvision==0.14.0 torchaudio==0.13.0 --index-url https://download.pytorch.org/whl/cu117
 
-pip install mamba-ssm
+pip install mamba-ssm==2.0.3
 ```
 
 

@@ -1,4 +1,4 @@
-name: BarcodeMamba
+name: mamba
 channels:
   - conda-forge
   - defaults

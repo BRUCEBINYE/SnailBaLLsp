@@ -275,7 +275,7 @@ def evaluate_target_domain(model, target_loader, config):
             acc = accuracy_score(trues, preds)
             
             if len(set(trues)) > 2:
-                f1 = f1_score(trues, preds, average='macro')
+                f1 = f1_score(trues, preds, average='weighted')
             else:
                 f1 = f1_score(trues, preds, average='binary')
             

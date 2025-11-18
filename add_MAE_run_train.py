@@ -7,7 +7,7 @@ import torch
 from sklearn.model_selection import train_test_split, KFold
 
 from addMAEtrain import *
-from addMAEparam import *
+from addMAEtrainTuning import *
 import itertools
 
 DEVICE = torch.device("cuda:0")
@@ -193,8 +193,6 @@ full_data = {
 }
 
 
-
-
 #===========  Set optimal operating parameters ==========#       
 base_config = {
     "embed_dim": 768,
@@ -222,30 +220,36 @@ final_config = base_config.copy()
 final_config.update({
     "learning_rate": 0.0001,
     "weight_decay": 0.01,
-    #"loss_weights": [1.2, 1.0, 0.8, 0.6, 0.4, 0.2],
-    "loss_weights": [1.0, 0.8, 0.6, 0.4, 0.2, 0.1],
+    "loss_weights": [1.2, 1.0, 0.8, 0.6, 0.4, 0.2],
+    #"loss_weights": [1.0, 0.8, 0.6, 0.4, 0.2, 0.1],
     "batch_size": 64,
-    "attention_heads": 16
+    "attention_heads": 32
 })
 
 
+
+#======== Save Model ========#
+
 model_out_fold = "./saved_models_MAE"
 os.makedirs(model_out_fold, exist_ok=True)
+
 
 ## We have already pretrained the models
 ## You can download the pretrained models in DRYAD
 model_pretrained_fold = "./pretrained_models"
 
+
+
 #======== Stage 0 training ========#
 print("\n=== Stage 0: COI Only Training ===")
-# Initialize and train
+## Initialize and train
 coi_model = CurriculumDMGHANmae(final_config, curriculum_stage=0).to(DEVICE)
 # Train
 trained_coi_model = train_coi_only(
     model=coi_model,
     full_data=full_data,
     config=final_config,
-    best_model_path=f"{model_out_fold}/stage0_coi_only_BestAcc.pt"
+    best_model_path=f"{model_out_fold}/addMAE_stage0_coi_only_BestAcc.pt"
 )
 
 
@@ -258,11 +262,11 @@ trained_coi_model = train_coi_only(
 #    "weight_decay": 0.01,
 #    "loss_weights": [1.0, 0.8, 0.6, 0.4, 0.2, 0.1],
 #    "batch_size": 64,
-#    "attention_heads": 16,
+#    "attention_heads": 32,
 #    "curriculum_stage": 0
 #})
 #trained_coi_model = CurriculumDMGHANmae(final_config0).to(DEVICE)
-#state_dict = torch.load(f"{model_pretrained_fold}/stage0_coi_only_BestAcc.pt", map_location=DEVICE)
+#state_dict = torch.load(f"{model_pretrained_fold}/addMAE_stage0_coi_only_BestAcc.pt", map_location=DEVICE)
 #trained_coi_model.load_state_dict(state_dict, strict=True)
 #trained_coi_model.eval()
 
@@ -275,13 +279,14 @@ multimodal_model.load_state_dict(trained_coi_model.state_dict(), strict=False)
 # Freeze COI related parameters
 for name, param in multimodal_model.named_parameters():
     if 'coi' in name or 'coi_MAE' in name:
+        print(name)
         param.requires_grad_(False)
 # Perform multimodal training
 trained_multimodal = train_multimodal(
     model=multimodal_model,
     full_data=full_data,
     config=final_config,
-    best_model_path=f"{model_out_fold}/stage1_multimodal_fusion_BestMeanAcc.pt"
+    best_model_path=f"{model_out_fold}/addMAE_stage1_multimodal_fusion_BestMeanAcc.pt"
 )
 
 #-------- If there is already a trained model, you can directly load it with the following code --------#
@@ -292,11 +297,11 @@ trained_multimodal = train_multimodal(
 #    "weight_decay": 0.01,
 #    "loss_weights": [1.0, 0.8, 0.6, 0.4, 0.2, 0.1],
 #    "batch_size": 64,
-#    "attention_heads": 16,
+#    "attention_heads": 32,
 #    "curriculum_stage": 1
 #})
-#trained_multimodal = CurriculumDMGHAN(final_config1, curriculum_stage=1).to(DEVICE)
-#state_dict = torch.load(f"{model_pretrained_fold}/stage1_multimodal_fusion_BestMeanAcc.pt", map_location=DEVICE)
+#trained_multimodal = CurriculumDMGHANmae(final_config1, curriculum_stage=1).to(DEVICE)
+#state_dict = torch.load(f"{model_pretrained_fold}/addMAE_stage1_multimodal_fusion_BestMeanAcc.pt", map_location=DEVICE)
 #trained_multimodal.load_state_dict(state_dict, strict=True)
 #trained_multimodal.eval()
 
@@ -311,7 +316,7 @@ multimodal_model_full = train_multimodal(
     model=trained_multimodal, 
     full_data=full_data, 
     config=final_config,
-    best_model_path=f"{model_out_fold}/stage2_multimodal_full_BestMeanAcc.pt"
+    best_model_path=f"{model_out_fold}/addMAE_stage2_multimodal_fulltuning_BestMeanAcc.pt"
     )
 
 #-------- If there is already a trained model, you can directly load it with the following code --------#
@@ -322,11 +327,11 @@ multimodal_model_full = train_multimodal(
 #    "weight_decay": 0.01,
 #    "loss_weights": [1.0, 0.8, 0.6, 0.4, 0.2, 0.1],
 #    "batch_size": 64,
-#    "attention_heads": 16,
+#    "attention_heads": 32,
 #    "curriculum_stage": 2
 #})
-#multimodal_model_full = CurriculumDMGHAN(final_config2, curriculum_stage=2).to(DEVICE)
-#state_dict = torch.load(f"{model_pretrained_fold}/stage2_multimodal_full_BestMeanAcc.pt", map_location=DEVICE)
+#multimodal_model_full = CurriculumDMGHANmae(final_config2, curriculum_stage=2).to(DEVICE)
+#state_dict = torch.load(f"{model_pretrained_fold}/addMAE_stage2_multimodal_fulltuning_BestMeanAcc.pt", map_location=DEVICE)
 #multimodal_model_full.load_state_dict(state_dict, strict=True)
 #multimodal_model_full.eval()
 
@@ -368,6 +373,7 @@ for level in ['subclass', 'order', 'superfamily', 'family', 'genus', 'species']:
     print(f"- {level.capitalize()}: "
         f"Acc={test_metrics[level]['accuracy']:.4f} | "
         f"F1={test_metrics[level]['f1']:.4f}")
+
 
 
 

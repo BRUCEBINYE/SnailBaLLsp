@@ -115,21 +115,21 @@ coi_emb = np.load("./embedding/ERNIE-RNA/Augmented_76577_All_used_Gastropoda_seq
 coi_index = np.array([i for i in range(coi_emb.shape[0])])
 
 rn16s_emb = np.load("./embedding/ERNIE-RNA/Augmented_Other_Marker_16S_sequences/cls_embedding.npy")
-rn16s_index = pd.read_csv("./data_Train_Val_Test/Augmented_Other_Marker_16S.txt", sep="\t")['Index'].values
+rn16s_index = pd.read_csv("./data/data_Train_Val_Test/Augmented_Other_Marker_16S.txt", sep="\t")['Index'].values
 
 h3_emb = np.load("./embedding/ERNIE-RNA/Augmented_Other_Marker_H3_sequences/cls_embedding.npy")
-h3_index = pd.read_csv("./data_Train_Val_Test/Augmented_Other_Marker_H3.txt", sep="\t")['Index'].values
+h3_index = pd.read_csv("./data/data_Train_Val_Test/Augmented_Other_Marker_H3.txt", sep="\t")['Index'].values
 
 rn18s_emb = np.load("./embedding/ERNIE-RNA/Augmented_Other_Marker_18S_sequences/cls_embedding.npy")
-rn18s_index = pd.read_csv("./data_Train_Val_Test/Augmented_Other_Marker_18S.txt", sep="\t")['Index'].values
+rn18s_index = pd.read_csv("./data/data_Train_Val_Test/Augmented_Other_Marker_18S.txt", sep="\t")['Index'].values
 
 its1_emb = np.load("./embedding/ERNIE-RNA/Augmented_Other_Marker_ITS1_sequences/cls_embedding.npy")
-its1_index = pd.read_csv("./data_Train_Val_Test/Augmented_Other_Marker_ITS1.txt", sep="\t")['Index'].values
+its1_index = pd.read_csv("./data/data_Train_Val_Test/Augmented_Other_Marker_ITS1.txt", sep="\t")['Index'].values
 
 its2_emb = np.load("./embedding/ERNIE-RNA/Augmented_Other_Marker_ITS2_sequences/cls_embedding.npy")
-its2_index = pd.read_csv("./data_Train_Val_Test/Augmented_Other_Marker_ITS2.txt", sep="\t")['Index'].values
+its2_index = pd.read_csv("./data/data_Train_Val_Test/Augmented_Other_Marker_ITS2.txt", sep="\t")['Index'].values
 
-dfl = pd.read_csv("./data_Train_Val_Test/Augmented_76577_All_used_Gastropoda_seqs_Taxinomy_LabelSpecies.txt", sep="\t")
+dfl = pd.read_csv("./data/data_Train_Val_Test/Augmented_76577_All_used_Gastropoda_seqs_Taxinomy_LabelSpecies.txt", sep="\t")
 labels = dfl[['subclass', 'order', 'superfamily', 'family', 'genus', 'species']]
 labels = preprocess_labels(labels, [2, 24, 103, 354, 2753, 11295])
 
@@ -164,8 +164,8 @@ full_dataset = MultiModalCOIDataset(
     ]
 )
 
-trainval_idx = torch.load("./data/trainval_idx.npy")
-test_idx = torch.load("./data/test_idx.npy")
+trainval_idx = torch.load("./data/data_Train_Val_Test/trainval_idx.npy")
+test_idx = torch.load("./data/data_Train_Val_Test/test_idx.npy")
 
 #with open('./data/test_idx_output.csv', 'w', newline='') as file:
 #    writer = csv.writer(file)
@@ -180,6 +180,7 @@ test_dataset = torch.utils.data.Subset(full_dataset, test_idx)
 
 source_loader = DataLoader(source_dataset, batch_size=128, shuffle=True)
 test_loader = DataLoader(test_dataset, batch_size=128, shuffle=True)
+
 
 
 
@@ -202,9 +203,11 @@ final_config.update({
     "attention_heads": 16
 })
 
-model_out_fold = "./saved_models"
-os.makedirs(model_out_fold, exist_ok=True)
 
+
+## We have already pretrained the models
+## You can download the pretrained models in DRYAD
+model_pretrained_fold = "./pretrained_models"
 
 
 #======== Stage 0 Training ========#
@@ -218,8 +221,9 @@ final_config0.update({
     "batch_size": 64,
     "attention_heads": 16,
     "curriculum_stage": 0
+})
 trained_coi_model = CurriculumDMGHAN(final_config0).to(DEVICE)
-state_dict = torch.load(f"{model_out_fold}/stage0_coi_only.pt", map_location=DEVICE)
+state_dict = torch.load(f"{model_pretrained_fold}/stage0_coi_only.pt", map_location=DEVICE)
 trained_coi_model.load_state_dict(state_dict, strict=True)
 trained_coi_model.eval()
 
@@ -237,7 +241,7 @@ final_config1.update({
     "curriculum_stage": 1
 })
 trained_multimodal = CurriculumDMGHAN(final_config1, curriculum_stage=1).to(DEVICE)
-state_dict = torch.load(f"{model_out_fold}/stage1_multimodal_fusion_BestMeanAcc.pt", map_location=DEVICE)
+state_dict = torch.load(f"{model_pretrained_fold}/stage1_multimodal_fusion_BestMeanAcc.pt", map_location=DEVICE)
 trained_multimodal.load_state_dict(state_dict, strict=True)
 trained_multimodal.eval()
 
@@ -255,7 +259,7 @@ final_config2.update({
     "curriculum_stage": 2
 })
 multimodal_model_full = CurriculumDMGHAN(final_config2, curriculum_stage=2).to(DEVICE)
-state_dict = torch.load(f"{model_out_fold}/stage2_multimodal_full_BestMeanAcc.pt", map_location=DEVICE)
+state_dict = torch.load(f"{model_pretrained_fold}/stage2_multimodal_fulltuning_BestMeanAcc.pt", map_location=DEVICE)
 multimodal_model_full.load_state_dict(state_dict, strict=True)
 multimodal_model_full.eval()
 
@@ -278,16 +282,16 @@ tester = FixedMultiModalTester(
 
 #### GenBank From 20250101-20250523
 label_arrays_1 = tester.load_labels(
-    "/data4/yebin/COI/SnailBaLLsp_package/data_Independent/GenBank_From20250101/Independent_Gastropoda_seqs_n_1927_EDITED_LabelSpecies.txt"
+    "./data/data_Independent/GenBank_From20250101/Independent_Gastropoda_seqs_n_1927_EDITED_LabelSpecies.txt"
 )
-coi_emb_1 = np.load("/data4/yebin/ERNIE-RNA/results/ernie_rna_representations/GenBank_From20250101_Independent_Gastropoda_seqs_n_1927_EDITED_sequences/cls_embedding.npy")
+coi_emb_1 = np.load("./embedding/ERNIE-RNA/Independent1_GenBank_From20250101_n_1927_EDITED_sequences/cls_embedding.npy")
 print(coi_emb_1.shape)
 
 #### BOLD_Mar2025 Gastropoda, real seqs
 label_arrays_2 = tester.load_labels(
-    "/data4/yebin/COI/SnailBaLLsp_package/data_Independent/BOLD_Mar2025_Gastropoda/EDITED_Independent2_BOLD_Taxonomy_label_is_the_SAME_with_training_LabelsSpecies.txt"
+    "./data/data_Independent/BOLD_Mar2025_Gastropoda/EDITED_Independent2_BOLD_Taxonomy_label_is_the_SAME_with_training_LabelsSpecies.txt"
 )  # need to train new model
-coi_emb_2 = np.load("/data4/yebin/ERNIE-RNA/results/ernie_rna_representations/EDITED_Independent2_BOLD_Taxonomy_label_is_the_SAME_with_training_Sequences/cls_embedding.npy")
+coi_emb_2 = np.load("./embedding/ERNIE-RNA/Independent2_BOLD_Taxonomy_label_is_the_SAME_with_training_Sequences/cls_embedding.npy")
 print(coi_emb_2.shape)
 
 #### Merge two independent test sets
@@ -314,6 +318,9 @@ target_loader = DataLoader(target_dataset, batch_size=128, shuffle=True)
 #=== Application domain adaptation for target_dataset ====#
 #=========================================================#
 
+model_out_fold = "./saved_models"
+os.makedirs(model_out_fold, exist_ok=True)
+
 
 #-------  COI only + domain adaptative -------#
 
@@ -336,12 +343,7 @@ for level in ['subclass', 'order', 'superfamily', 'family', 'genus', 'species']:
     print(f"- {level.capitalize()}: "
           f"Acc={final_results[level]['accuracy']:.4f} | "
           f"F1={final_results[level]['f1']:.4f}")
-#- Subclass: Acc=0.9880 | F1=0.9880
-#- Order: Acc=0.8228 | F1=0.8276
-#- Superfamily: Acc=0.6480 | F1=0.6422
-#- Family: Acc=0.5353 | F1=0.5445
-#- Genus: Acc=0.1710 | F1=0.1591
-#- Species: Acc=0.0877 | F1=0.0781
+
 
 target_metrics2_vlid = test_model_ValidSample(da_model0, target_loader, DEVICE)
 print("Test Metrics:")
@@ -350,12 +352,7 @@ for level in ['subclass', 'order', 'superfamily', 'family', 'genus', 'species']:
         f"Acc={target_metrics2_vlid[level]['accuracy_valid']:.4f} | "
         f"F1={target_metrics2_vlid[level]['f1_valid']:.4f} | "
         f"Counts={target_metrics2_vlid[level]['count_valid']}")
-#- Subclass: Acc=0.9921 | F1=0.9929 | Counts=3146
-#- Order: Acc=0.8601 | F1=0.4975 | Counts=3146
-#- Superfamily: Acc=0.7562 | F1=0.4535 | Counts=3146
-#- Family: Acc=0.6548 | F1=0.3141 | Counts=3146
-#- Genus: Acc=0.6151 | F1=0.2722 | Counts=3146
-#- Species: Acc=0.4447 | F1=0.2217 | Counts=3146
+
 
 print("\n=== The evaluation results of the best model for test-loader ===")
 final_results2 = evaluate_target_domain(da_model0, test_loader, da_config0)
@@ -386,12 +383,7 @@ for level in ['subclass', 'order', 'superfamily', 'family', 'genus', 'species']:
     print(f"- {level.capitalize()}: "
           f"Acc={final_results[level]['accuracy']:.4f} | "
           f"F1={final_results[level]['f1']:.4f}")
-#- Subclass: Acc=0.9888 | F1=0.9889
-#- Order: Acc=0.8339 | F1=0.8402
-#- Superfamily: Acc=0.6625 | F1=0.6527
-#- Family: Acc=0.5492 | F1=0.5602
-#- Genus: Acc=0.1757 | F1=0.1622
-#- Species: Acc=0.0918 | F1=0.0817
+
 
 target_metrics2_vlid = test_model_ValidSample(da_model1, target_loader, DEVICE)
 print("Test Metrics:")
@@ -400,12 +392,7 @@ for level in ['subclass', 'order', 'superfamily', 'family', 'genus', 'species']:
         f"Acc={target_metrics2_vlid[level]['accuracy_valid']:.4f} | "
         f"F1={target_metrics2_vlid[level]['f1_valid']:.4f} | "
         f"Counts={target_metrics2_vlid[level]['count_valid']}")
-#- Subclass: Acc=0.9965 | F1=0.9968 | Counts=3146
-#- Order: Acc=0.8706 | F1=0.5599 | Counts=3146
-#- Superfamily: Acc=0.7648 | F1=0.4621 | Counts=3146
-#- Family: Acc=0.6656 | F1=0.3418 | Counts=3146
-#- Genus: Acc=0.6335 | F1=0.2747 | Counts=3146
-#- Species: Acc=0.4654 | F1=0.2426 | Counts=3146
+
 
 print("\n=== The evaluation results of the best model for test-loader ===")
 final_results2 = evaluate_target_domain(da_model1, test_loader, da_config1)
@@ -436,12 +423,7 @@ for level in ['subclass', 'order', 'superfamily', 'family', 'genus', 'species']:
     print(f"- {level.capitalize()}: "
           f"Acc={final_results[level]['accuracy']:.4f} | "
           f"F1={final_results[level]['f1']:.4f}")
-#- Subclass: Acc=0.9916 | F1=0.9916
-#- Order: Acc=0.8274 | F1=0.8341
-#- Superfamily: Acc=0.6792 | F1=0.6638
-#- Family: Acc=0.5499 | F1=0.5573
-#- Genus: Acc=0.1799 | F1=0.1627
-#- Species: Acc=0.0917 | F1=0.0814
+
 
 target_metrics2_vlid = test_model_ValidSample(da_model2, target_loader, DEVICE)
 print("Test Metrics:")
@@ -450,12 +432,7 @@ for level in ['subclass', 'order', 'superfamily', 'family', 'genus', 'species']:
         f"Acc={target_metrics2_vlid[level]['accuracy_valid']:.4f} | "
         f"F1={target_metrics2_vlid[level]['f1_valid']:.4f} | "
         f"Counts={target_metrics2_vlid[level]['count_valid']}")
-#- Subclass: Acc=0.9959 | F1=0.9963 | Counts=3146
-#- Order: Acc=0.8789 | F1=0.5364 | Counts=3146
-#- Superfamily: Acc=0.7864 | F1=0.4629 | Counts=3146
-#- Family: Acc=0.6729 | F1=0.3427 | Counts=3146
-#- Genus: Acc=0.6459 | F1=0.2804 | Counts=3146
-#- Species: Acc=0.4647 | F1=0.2505 | Counts=3146
+
 
 print("\n=== The evaluation results of the best model for test-loader ===")
 final_results2 = evaluate_target_domain(da_model2, test_loader, da_config2)
@@ -463,7 +440,6 @@ for level in ['subclass', 'order', 'superfamily', 'family', 'genus', 'species']:
     print(f"- {level.capitalize()}: "
           f"Acc={final_results2[level]['accuracy_valid']:.4f} | "
           f"F1={final_results2[level]['f1_valid']:.4f}")
-
 
 
 

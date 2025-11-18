@@ -22,7 +22,7 @@ base_config = {
     "epochs": 300
 }
 
-model_out_fold = "./saved_models"
+model_out_fold = "./pretrained_models"
 os.makedirs(model_out_fold, exist_ok=True)
 
 

@@ -109,21 +109,21 @@ coi_emb = np.load("./embedding/ERNIE-RNA/Augmented_76577_All_used_Gastropoda_seq
 coi_index = np.array([i for i in range(coi_emb.shape[0])])
 
 rn16s_emb = np.load("./embedding/ERNIE-RNA/Augmented_Other_Marker_16S_sequences/cls_embedding.npy")
-rn16s_index = pd.read_csv("./data_Train_Val_Test/Augmented_Other_Marker_16S.txt", sep="\t")['Index'].values
+rn16s_index = pd.read_csv("./data/data_Train_Val_Test/Augmented_Other_Marker_16S.txt", sep="\t")['Index'].values
 
 h3_emb = np.load("./embedding/ERNIE-RNA/Augmented_Other_Marker_H3_sequences/cls_embedding.npy")
-h3_index = pd.read_csv("./data_Train_Val_Test/Augmented_Other_Marker_H3.txt", sep="\t")['Index'].values
+h3_index = pd.read_csv("./data/data_Train_Val_Test/Augmented_Other_Marker_H3.txt", sep="\t")['Index'].values
 
 rn18s_emb = np.load("./embedding/ERNIE-RNA/Augmented_Other_Marker_18S_sequences/cls_embedding.npy")
-rn18s_index = pd.read_csv("./data_Train_Val_Test/Augmented_Other_Marker_18S.txt", sep="\t")['Index'].values
+rn18s_index = pd.read_csv("./data/data_Train_Val_Test/Augmented_Other_Marker_18S.txt", sep="\t")['Index'].values
 
 its1_emb = np.load("./embedding/ERNIE-RNA/Augmented_Other_Marker_ITS1_sequences/cls_embedding.npy")
-its1_index = pd.read_csv("./data_Train_Val_Test/Augmented_Other_Marker_ITS1.txt", sep="\t")['Index'].values
+its1_index = pd.read_csv("./data/data_Train_Val_Test/Augmented_Other_Marker_ITS1.txt", sep="\t")['Index'].values
 
 its2_emb = np.load("./embedding/ERNIE-RNA/Augmented_Other_Marker_ITS2_sequences/cls_embedding.npy")
-its2_index = pd.read_csv("./data_Train_Val_Test/Augmented_Other_Marker_ITS2.txt", sep="\t")['Index'].values
+its2_index = pd.read_csv("./data/data_Train_Val_Test/Augmented_Other_Marker_ITS2.txt", sep="\t")['Index'].values
 
-dfl = pd.read_csv("./data_Train_Val_Test/Augmented_76577_All_used_Gastropoda_seqs_Taxinomy_LabelSpecies.txt", sep="\t")
+dfl = pd.read_csv("./data/data_Train_Val_Test/Augmented_76577_All_used_Gastropoda_seqs_Taxinomy_LabelSpecies.txt", sep="\t")
 labels = dfl[['subclass', 'order', 'superfamily', 'family', 'genus', 'species']]
 labels = preprocess_labels(labels, [2, 24, 103, 354, 2753, 11295])
 
@@ -166,8 +166,8 @@ full_dataset = MultiModalCOIDataset(
 trainval_dataset = torch.utils.data.Subset(full_dataset, trainval_idx)
 test_dataset = torch.utils.data.Subset(full_dataset, test_idx)
 
-torch.save(trainval_idx, "trainval_idx.npy")
-torch.save(test_idx, "test_idx.npy")
+torch.save(trainval_idx, "./data/data_Train_Val_Test/trainval_idx.npy")
+torch.save(test_idx, "./data/data_Train_Val_Test/test_idx.npy")
 
 # Organize data format
 full_data = {
@@ -188,6 +188,8 @@ full_data = {
 }
 
 
+
+
 #===========  Set optimal operating parameters ==========#       
 base_config = {
     "embed_dim": 768,
@@ -201,16 +203,25 @@ final_config = base_config.copy()
 final_config.update({
     "learning_rate": 0.0001,
     "weight_decay": 0.01,
-    "loss_weights": [1.2, 1.0, 0.8, 0.6, 0.4, 0.2],
+    #"loss_weights": [1.2, 1.0, 0.8, 0.6, 0.4, 0.2],
+    "loss_weights": [ 1.0, 0.8, 0.6, 0.4, 0.2, 0.1],
     "batch_size": 64,
     "attention_heads": 16
 })
 
-model_out_fold = "./saved_models"
-os.makedirs(model_out_fold, exist_ok=True)
+
+## We have already pretrained the models
+## You can download the pretrained models in DRYAD
+model_pretrained_fold = "./pretrained_models"
+
+
 
 
 #======== Stage 0: training ========#
+
+model_out_fold = "./saved_models"
+os.makedirs(model_out_fold, exist_ok=True)
+
 print("\n=== Stage 0: COI Only Training ===")
 # Initialize and train
 coi_model = CurriculumDMGHAN(final_config, curriculum_stage=0).to(DEVICE)
@@ -232,10 +243,10 @@ trained_coi_model = train_coi_only(
 #    "attention_heads": 16,
 #    "curriculum_stage": 0
 #})
-trained_coi_model = CurriculumDMGHAN(final_config0).to(DEVICE)
-state_dict = torch.load(f"{model_out_fold}/stage0_coi_only.pt", map_location=DEVICE)
-trained_coi_model.load_state_dict(state_dict, strict=True)
-trained_coi_model.eval()
+#trained_coi_model = CurriculumDMGHAN(final_config0).to(DEVICE)
+#state_dict = torch.load(f"{model_pretrained_fold}/stage0_coi_only.pt", map_location=DEVICE)
+#trained_coi_model.load_state_dict(state_dict, strict=True)
+#trained_coi_model.eval()
 
 
 #======== Stage 1: training ========#
@@ -265,7 +276,7 @@ trained_multimodal = train_multimodal(
 #    "curriculum_stage": 1
 #})
 #trained_multimodal = CurriculumDMGHAN(final_config1, curriculum_stage=1).to(DEVICE)
-#state_dict = torch.load(f"{model_out_fold}/stage1_multimodal_fusion_BestMeanAcc.pt", map_location=DEVICE)
+#state_dict = torch.load(f"{model_pretrained_fold}/stage1_multimodal_fusion_BestMeanAcc.pt", map_location=DEVICE)
 #trained_multimodal.load_state_dict(state_dict, strict=True)
 #trained_multimodal.eval()
 
@@ -280,23 +291,23 @@ multimodal_model_full = train_multimodal(
     model=trained_multimodal, 
     full_data=full_data, 
     config=final_config,
-    best_model_path=f"{model_out_fold}/stage2_multimodal_full_BestMeanAcc.pt"
+    best_model_path=f"{model_out_fold}/stage2_multimodal_fulltuning_BestMeanAcc.pt"
     )
 
 #-------- Directly load existed model --------#
-final_config2 = base_config.copy()
-final_config2.update({
-    "learning_rate": 0.0001,
-    "weight_decay": 0.01,
-    "loss_weights": [1.0, 0.8, 0.6, 0.4, 0.2, 0.1],
-    "batch_size": 64,
-    "attention_heads": 16,
-    "curriculum_stage": 2
-})
-multimodal_model_full = CurriculumDMGHAN(final_config2, curriculum_stage=2).to(DEVICE)
-state_dict = torch.load(f"{model_out_fold}/stage2_multimodal_full_BestMeanAcc.pt", map_location=DEVICE)
-multimodal_model_full.load_state_dict(state_dict, strict=True)
-multimodal_model_full.eval()
+#final_config2 = base_config.copy()
+#final_config2.update({
+#    "learning_rate": 0.0001,
+#    "weight_decay": 0.01,
+#    "loss_weights": [1.0, 0.8, 0.6, 0.4, 0.2, 0.1],
+#    "batch_size": 64,
+#    "attention_heads": 16,
+#    "curriculum_stage": 2
+#})
+#multimodal_model_full = CurriculumDMGHAN(final_config2, curriculum_stage=2).to(DEVICE)
+#state_dict = torch.load(f"{model_pretrained_fold}/stage2_multimodal_fulltuning_BestMeanAcc.pt", map_location=DEVICE)
+#multimodal_model_full.load_state_dict(state_dict, strict=True)
+#multimodal_model_full.eval()
 
 
 
@@ -336,7 +347,6 @@ for level in ['subclass', 'order', 'superfamily', 'family', 'genus', 'species']:
     print(f"- {level.capitalize()}: "
         f"Acc={test_metrics[level]['accuracy']:.4f} | "
         f"F1={test_metrics[level]['f1']:.4f}")
-
 
 
 

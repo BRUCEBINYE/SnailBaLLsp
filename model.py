@@ -171,52 +171,60 @@ class CurriculumDMGHAN(DMGHAN):
 
 
 
+
 class CurriculumDMGHANmae(DMGHAN):
     def __init__(self, config, curriculum_stage=0):
         super().__init__(config)
         self.curriculum_stage = curriculum_stage
-        del self.input_proj
+        del self.input_proj  # Ensure the removal of the original inputsproj layer
         
-        # Add COI fusion module
+        # COI Fusion Module
         self.coi_fusion = nn.Sequential(
-            nn.Linear(config["mamba_config"]["d_model"] * 2,  # The input is a combination of primary and additional COI features
+            nn.Linear(config["mamba_config"]["d_model"] * 2,  # The concat of COI + COI_MAE
                      config["mamba_config"]["d_model"]),
             nn.ReLU(),
             nn.LayerNorm(config["mamba_config"]["d_model"])
         )
         
-        # The original COI projection layer remains unchanged
         self.coi_projector = nn.Linear(768, config["mamba_config"]["d_model"])
         self.coi_MAE_projector = nn.Linear(768, config["mamba_config"]["d_model"])
         
         if curriculum_stage > 0:
-            # Other modal projection layers: 768 -> 256
+            # Projector of other mode: 768 -> 256
             self.modal_projectors = nn.ModuleDict({
                 modal: nn.Linear(768, config["mamba_config"]["d_model"])
                 for modal in ['rn16s', 'h3', 'rn18s', 'its1', 'its2']
             })  
-            # Fusion gate network: 256*6 -> 6
+            # Fusion Gate Network: 256*7 -> 7
             self.fusion_gate = nn.Sequential(
-                nn.Linear(config["mamba_config"]["d_model"] * 6, 6),
+                nn.Linear(config["mamba_config"]["d_model"] * 7, 7),
                 nn.Softmax(dim=-1)
             )
         
     
     def forward(self, x):
         if self.curriculum_stage == 0:
-            # Stage 0: RNA+DNA COI modal fusion
+            # Stage 0: COI + COI_MAE modal fusion
             coi_main = self.coi_projector(x['embeds']['coi'])  # [B, 12, 256]
             coi_MAE = self.coi_MAE_projector(x['embeds']['coi_MAE'])  # [B, 768] -> [B, 256]
         
             # Expand auxiliary features to match sequence length
             coi_MAE_expanded = coi_MAE.unsqueeze(1).expand(-1, 12, -1)  # [B, 12, 256]
         
-            # Splicing and fusing features
+            # Fusing features
             fused_coi = torch.cat([coi_main, coi_MAE_expanded], dim=-1)  # [B, 12, 512]
             fused = self.coi_fusion(fused_coi)  # [B, 12, 256]
         else:
+            # COI
+            coi_main = self.coi_projector(x['embeds']['coi'])  # [B, 12, 256]
+            # COI_MAE
+            coi_MAE = self.coi_MAE_projector(x['embeds']['coi_MAE'])  # [B, 768] -> [B, 256]
+            coi_MAE_expanded = coi_MAE.unsqueeze(1).expand(-1, 12, -1)  # [B, 12, 256]
+
+            # Other modes
             projected = {
-                'coi': self.coi_projector(x['embeds']['coi']),
+                'coi': coi_main,
+                'coi_MAE': coi_MAE_expanded,
                 'rn16s': self.modal_projectors['rn16s'](x['embeds']['rn16s']),
                 'h3': self.modal_projectors['h3'](x['embeds']['h3']),
                 'rn18s': self.modal_projectors['rn18s'](x['embeds']['rn18s']),
@@ -224,19 +232,33 @@ class CurriculumDMGHANmae(DMGHAN):
                 'its2': self.modal_projectors['its2'](x['embeds']['its2'])
             }
 
+            # Perform average pooling on each modality (along the sequence dimension)
             pooled_features = {modal: feat.mean(dim=1) for modal, feat in projected.items()}
         
-            concated = torch.cat(list(pooled_features.values()), dim=-1)
+            # Features after pooling[batch, 256*7]
+            concated = torch.cat([
+                pooled_features['coi'],
+                pooled_features['coi_MAE'],
+                pooled_features['rn16s'],
+                pooled_features['h3'],
+                pooled_features['rn18s'],
+                pooled_features['its1'],
+                pooled_features['its2']
+            ],dim=-1)
         
-            weights = self.fusion_gate(concated)
+            # weights [batch, 7]
+            weights = self.fusion_gate(concated)  # shape: (B, 7)
         
+            # Weighted fusion: weighted sum of sequence features of each modality
             fused = sum(
-                weight.unsqueeze(-1).unsqueeze(-1) * feat
-                for weight, feat in zip(weights.unbind(-1), projected.values())
+                weight.unsqueeze(-1).unsqueeze(-1) * projected[modal]  # weight shape [B,1,1], featshape [B,12,256]
+                for weight, modal in zip(weights.unbind(-1), ['coi', 'coi_MAE', 'rn16s', 'h3', 'rn18s', 'its1', 'its2'])
             )
-
-        # Input features into Mamba module
-        seq_features = self.mamba(fused)
+    
+        # Ensure that the input Mamba is a 3D tensor
+        #print(f"Mamba input shape: {fused.shape}")  # must be (B, 12, 256)
+        # input into Mamba module
+        seq_features = self.mamba(fused)  #  (B, seq_len, d_model)
         pooled = seq_features.mean(dim=1)
         
 

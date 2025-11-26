@@ -198,23 +198,22 @@ def train_coi_only(model, full_data, config, best_model_path):
 
 
 
-
 def train_multimodal(model, full_data, config, best_model_path):
-    # Create a complete multimodal dataset
+    # Create the complete multi-modal data (including coi_MAE)
     multimodal_dataset = MultiModalCOIDataset(
-        {
+        embeddings_dict={
             'coi': full_data['coi'],
+            'coi_MAE': full_data.get('coi_MAE', torch.zeros_like(full_data['coi'][:, 0, :])),
             'rn16s': full_data['rn16s'],
             'h3': full_data['h3'],
             'rn18s': full_data['rn18s'],
             'its1': full_data['its1'],
             'its2': full_data['its2'],
-            # ... Other modal data ...
         },
-        full_data['labels']
+        labels=full_data['labels']
     )
     
-    # Divide the training set and validation set (9:1)
+    # Training and validating set (9:1)
     train_size = int(0.9 * len(multimodal_dataset))
     val_size = len(multimodal_dataset) - train_size
     train_dataset, val_dataset = torch.utils.data.random_split(
@@ -222,21 +221,41 @@ def train_multimodal(model, full_data, config, best_model_path):
         generator=torch.Generator().manual_seed(42)
     )
     
-    # Create a data loader
+    def collate_fn(batch):
+        collated = {
+            'embeds': {
+                'coi': torch.stack([item['embeds']['coi'] for item in batch]),
+                'coi_MAE': torch.stack([item['embeds']['coi_MAE'] for item in batch]),
+                'rn16s': torch.stack([item['embeds']['rn16s'] for item in batch]),
+                'h3': torch.stack([item['embeds']['h3'] for item in batch]),
+                'rn18s': torch.stack([item['embeds']['rn18s'] for item in batch]),
+                'its1': torch.stack([item['embeds']['its1'] for item in batch]),
+                'its2': torch.stack([item['embeds']['its2'] for item in batch]),
+            },
+            'labels': {
+                level: torch.stack([item['labels'][level] for item in batch])
+                for level in ['subclass', 'order', 'superfamily', 'family', 'genus', 'species']
+            }
+        }
+        return collated
+    
+    # Create data loader
     train_loader = DataLoader(
         train_dataset,
         batch_size=config["batch_size"],
         shuffle=True,
+        collate_fn=collate_fn,
         pin_memory=True,
         drop_last=True
     )
     val_loader = DataLoader(
         val_dataset,
         batch_size=config["batch_size"],
+        collate_fn=collate_fn,
         pin_memory=True
     )
     
-    # Initialize optimizer and loss function
+    # Initialization of optimizer and loss function
     optimizer = optim.AdamW(
         filter(lambda p: p.requires_grad, model.parameters()),
         lr=config["learning_rate"],
@@ -244,12 +263,10 @@ def train_multimodal(model, full_data, config, best_model_path):
     )
     criterion = HierarchicalLoss(weights=[1.2, 1.0, 0.8, 0.6, 0.4, 0.2])
     
-    # Training parameters
-    #best_val_loss = float('inf')
+    # Parameters
     best_val_acc = 0.0
     patience_counter = 0
     patience = 30
-    #best_model_path = f"./saved_models_run7_MultiBarcodes/multimodal_stage{model.curriculum_stage}_{hash(str(config))}.pt"
     
     # Training epoch
     for epoch in range(config["epochs"]):
@@ -258,47 +275,47 @@ def train_multimodal(model, full_data, config, best_model_path):
         total_batches = len(train_loader)
         
         for batch_idx, batch in enumerate(train_loader):
+            # Prepare the input data (including coi_MAE)
             inputs = {
                 'embeds': {
-                    k: v.to(DEVICE, non_blocking=True)
-                    for k, v in batch['embeds'].items()
+                    'coi': batch['embeds']['coi'].to(DEVICE, non_blocking=True),
+                    'coi_MAE': batch['embeds']['coi_MAE'].to(DEVICE, non_blocking=True),
+                    'rn16s': batch['embeds']['rn16s'].to(DEVICE, non_blocking=True),
+                    'h3': batch['embeds']['h3'].to(DEVICE, non_blocking=True),
+                    'rn18s': batch['embeds']['rn18s'].to(DEVICE, non_blocking=True),
+                    'its1': batch['embeds']['its1'].to(DEVICE, non_blocking=True),
+                    'its2': batch['embeds']['its2'].to(DEVICE, non_blocking=True)
                 }
             }
+            
+            # Prepare the target label
             targets = {
                 level: batch['labels'][level].to(DEVICE, non_blocking=True)
                 for level in ['subclass', 'order', 'superfamily', 'family', 'genus', 'species']
             }
             
-            # Forward propagation
             optimizer.zero_grad()
             outputs = model(inputs)
             loss = criterion(outputs, targets)
             
-            # Back Propagation
             loss.backward()
-            
-            # Gradient clipping
-            torch.nn.utils.clip_grad_norm_(
-                model.parameters(),
-                max_norm=1.0,
-                norm_type=2
-            )
-            
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0, norm_type=2)
             optimizer.step()
+            
+            # Loss
             running_loss += loss.item()
             
-            # Print log
+            # Print the epoch
             if (batch_idx + 1) % max(1, int(0.1 * total_batches)) == 0:
                 current_loss = running_loss / (batch_idx + 1)
-                print(f"Epoch {epoch+1} | Batch {batch_idx+1}/{total_batches} | "
-                    f"Loss: {current_loss:.4f}")
+                print(f"Epoch {epoch+1} | Batch {batch_idx+1}/{total_batches} | Loss: {current_loss:.4f}")
         
         # Validation
         val_loss = evaluate_loss(model, val_loader, criterion, DEVICE)
         val_metrics = evaluate_model(model, val_loader, DEVICE)
         current_acc = np.mean([val_metrics[level]['accuracy'] for level in ['family', 'genus', 'species']])
-
-        # The early stop is based on verifying MEAN accuracy of 'family', 'genus', 'species'
+        
+        # Early stop and save the results
         if current_acc > best_val_acc:
             best_val_acc = current_acc
             patience_counter = 0
@@ -325,6 +342,8 @@ def train_multimodal(model, full_data, config, best_model_path):
     print(f"\n=== Multimodal Training (Stage {model.curriculum_stage}) Completed ==="
           f"Best Val Loss: {best_val_acc:.4f}")
     return model
+
+
 
 
 

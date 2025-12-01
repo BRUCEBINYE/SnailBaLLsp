@@ -1,0 +1,17 @@
+{
+    "coi_emb": "./data/Case_Study_Biv/Biv_35934_COI_seq_SEQUENCE/cls_embedding.npy",
+    "coi_MAE_emb": "./data/Case_Study_Biv/Biv_35934_COI_forInputBarcodeMAE.npy",
+    "coi_index": "./data/Case_Study_Biv/Biv_35934_COI_Seq_SpeciesLabels_ALLdf.txt",
+    "rn16s_emb": "./data/Case_Study_Biv/Biv_other_16S_Seq_SEQUENCE/cls_embedding.npy",
+    "rn16s_index": "./data/Case_Study_Biv/Biv_other_16S_Seq_SpeciesLabels_df.txt",
+    "h3_emb": "./data/Case_Study_Biv/Biv_other_H3_Seq_SEQUENCE/cls_embedding.npy",
+    "h3_index": "./data/Case_Study_Biv/Biv_other_H3_Seq_SpeciesLabels_df.txt",
+    "rn18s_emb": "./data/Case_Study_Biv/Biv_other_18S_Seq_SEQUENCE/cls_embedding.npy",
+    "rn18s_index": "./data/Case_Study_Biv/Biv_other_18S_Seq_SpeciesLabels_df.txt",
+    "its1_emb": "./data/Case_Study_Biv/Biv_other_ITS1_Seq_SEQUENCE/cls_embedding.npy",
+    "its1_index": "./data/Case_Study_Biv/Biv_other_ITS1_Seq_SpeciesLabels_df.txt",
+    "its2_emb": "./data/Case_Study_Biv/Biv_other_ITS2_Seq_SEQUENCE/cls_embedding.npy",
+    "its2_index": "./data/Case_Study_Biv/Biv_other_ITS2_Seq_SpeciesLabels_df.txt",
+    "labels": "./data/Case_Study_Biv/Biv_35934_COI_Seq_LABELS_ALL.txt",
+    "n_classes": [3, 17, 33, 71, 617, 3060]
+}

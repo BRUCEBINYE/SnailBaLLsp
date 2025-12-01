@@ -1,0 +1,12 @@
+{
+    "embed_dim": 768,
+    "seq_len": 12,
+    "mamba_config": {"d_model": 256, "dropout": 0.1},
+    "learning_rate": 5e-5,
+    "weight_decay": 0.01,
+    "loss_weights": [1.0, 0.8, 0.6, 0.4, 0.2, 0.1],
+    "batch_size": 32,
+    "attention_heads": 32,
+    "epochs": 100,
+    "curriculum_stage": 2
+}

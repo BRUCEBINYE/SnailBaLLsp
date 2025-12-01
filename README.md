@@ -163,17 +163,17 @@ Please note that BarcodeMAE currently can only generate embeddings for supervise
 - When you do not need to distinguish between training and test sets, you can put the two `.csv` files with known labels into the same folder. For example, put `new_COI_seq1.csv` and `new_COI_seq2.csv` together to the folder `new_sample`. And then place this folder in the BarcodeMAE directory.
 
 - Modify `knn_probing.py` provided in the BarcodeMAE directory. 
-  - First, add the necessary import statement at line 19:
+      - First, add the necessary import statement at line 19:
   ```python
   import numpy as np
   ```
-  - Second, at lines 127 and 128, replace "supervised_train.csv" and "unseen.csv" with "new_COI_seq1.csv" and "new_COI_seq2.csv", respectively.
-  - Then, after lines 150 and 153, add two lines of code to save the generated embeddings:
+      - Second, at lines 127 and 128, replace "supervised_train.csv" and "unseen.csv" with "new_COI_seq1.csv" and "new_COI_seq2.csv", respectively.
+      - Then, after lines 150 and 153, add two lines of code to save the generated embeddings:
   ```python
   np.save('new_COI_seq1_BarcodeMAE_embedding.npy', X_unseen)
   np.save('new_COI_seq2_BarcodeMAE_embedding.npy', X)
   ```
-  - Finally, save the modified script as `knn_probing_EDITED.py`.
+      - Finally, save the modified script as `knn_probing_EDITED.py`.
 
 - Run the folowing commands: 
 

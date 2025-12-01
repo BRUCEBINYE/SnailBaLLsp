@@ -108,7 +108,7 @@ python add_MAE_predict_new_sample.py
 
 ## Model transfer: Fine-tune with non-Gastropoda data (Bivalve)
 
-To evaluate the cross-taxon application capability of SnailBaLLsp beyond gastropod groups, we constructed a Bivalvia data as an example of transfer learning data for model transfer. The sample sizes for each Bivalvia group are as follows:
+To evaluate the cross-taxon application capability of SnailBaLLsp beyond gastropod groups, we constructed a Bivalvia data as an example of transfer learning data for model transfer. We provided this case study dataset in `./SnailBaLLsp/data/Case_Study_Biv/`. The sample sizes for each Bivalvia group are as follows:
 
 Taxonomy level | Number of categories
 ---- | ----

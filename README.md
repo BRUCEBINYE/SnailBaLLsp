@@ -198,7 +198,7 @@ Thus, you will obtain new_COI_seq1_BarcodeMAE_embedding.npy and new_COI_seq2_Bar
 
 If you think SnailBaLLsp is useful, please cite our work when you use it:
 
-B. Y., J. X., X. W., M. W., S. C.. [Multi‐barcoding‐based species identification using hierarchical attention network with staged curriculum learning](). Under Review.
+Bin Ye, Junfeng Xia, Xia Wan, Min Wu, Satoshi Chiba. [Multi‐barcoding‐based species identification using hierarchical attention network with staged curriculum learning](). In Press.
 
 ## License
 
